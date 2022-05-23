@@ -55,9 +55,69 @@ $(function () {
 
   $("#add2black, #add2white").on("click", addDomain);
 
+  $("#new_domain").on("paste", showSuggestDomains);
+
   utils.setBsSelectDefaults();
   getGroups();
 });
+
+function showSuggestDomains(event) {
+  function createButton(hostname) {
+    // Purposefully omit 'btn' class to save space on padding
+    return $('<button type="button" class="btn-link btn-block text-right">')
+      .append($("<i>").text(hostname))
+      .click(function () {
+        hideSuggestDomains();
+        newDomainEl.val(hostname);
+      });
+  }
+
+  var newDomainEl = $("#new_domain");
+  var suggestDomainEl = $("#suggest_domains");
+  var clipboardData = event.originalEvent.clipboardData.getData("text");
+
+  // Remove input listener otherwise the paste event will trigger a hide action
+  newDomainEl.off("input", hideSuggestDomains);
+
+  // setTimout is needed to get the pasted value from #new_domain
+  setTimeout(function () {
+    try {
+      // Only activate if the pasted text is same as #new_domain value
+      if (clipboardData !== newDomainEl.val()) {
+        hideSuggestDomains();
+        return;
+      }
+
+      var parts = new URL(clipboardData).hostname.split(".");
+      var table = $('<table style="text-align: right !important">');
+
+      for (var i = 0; i < parts.length - 1; ++i) {
+        var hostname = parts.slice(i).join(".");
+
+        table.append(
+          $("<tr>")
+            .append($('<td class="text-nowrap">').text(i === 0 ? "Did you mean" : "or"))
+            .append($("<td>").append(createButton(hostname)))
+        );
+      }
+
+      suggestDomainEl.slideUp("fast", function () {
+        suggestDomainEl.html(table);
+        suggestDomainEl.slideDown("fast", function () {
+          // On any input hide the suggested domains
+          newDomainEl.one("input", hideSuggestDomains);
+        });
+      });
+    } catch (ex) {
+      hideSuggestDomains();
+    }
+  });
+}
+
+function hideSuggestDomains() {
+  $("#new_domain").off("input", hideSuggestDomains);
+  $("#suggest_domains").slideUp("fast");
+}
 
 function initTable() {
   table = $("#domainsTable").DataTable({

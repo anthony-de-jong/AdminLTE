@@ -88,15 +88,17 @@ function showSuggestDomains(event) {
         return;
       }
 
+      // URL is not supported in IE11, but we are in a try-block so we can ignore it
+      // eslint-disable-next-line compat/compat
       var parts = new URL(clipboardData).hostname.split(".");
-      var table = $('<table style="text-align: right !important">');
+      var table = $("<table>");
 
       for (var i = 0; i < parts.length - 1; ++i) {
         var hostname = parts.slice(i).join(".");
 
         table.append(
           $("<tr>")
-            .append($('<td class="text-nowrap">').text(i === 0 ? "Did you mean" : "or"))
+            .append($('<td class="text-nowrap text-right">').text(i === 0 ? "Did you mean" : "or"))
             .append($("<td>").append(createButton(hostname)))
         );
       }
@@ -108,7 +110,7 @@ function showSuggestDomains(event) {
           newDomainEl.one("input", hideSuggestDomains);
         });
       });
-    } catch (ex) {
+    } catch {
       hideSuggestDomains();
     }
   });

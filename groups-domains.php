@@ -49,7 +49,7 @@
                                     <div class="form-group">
                                         <label for="new_domain">Domain:</label>
                                         <input id="new_domain" type="url" class="form-control active" placeholder="Domain to be added" autocomplete="off" spellcheck="false" autocapitalize="none" autocorrect="off">
-                                        <div id="suggest_domains" style="display: none; overflow-x: auto;"></div>
+                                        <div id="suggest_domains" class="table-responsive no-border"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 form-group">
